@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 struct bst
 {
     int data;
     struct bst *left, *right;
 };
 typedef struct bst bst;
-int in[100], pre[100], post[100], index = 0;
+int in[100], pre[100], post[100], inorder = 0,preorder=0,postorder=0;
 bst *create(int value)
 {
     bst *node;
@@ -31,7 +32,8 @@ void inorder_Traversal(bst *root)
     if (root != NULL)
     {
         inorder_Traversal(root->left);
-        printf("%d  ", root->data);
+        in[inorder]=root->data;
+        inorder++;
         inorder_Traversal(root->right);
     }
 }
@@ -39,7 +41,8 @@ void preorder_Traversal(bst *root)
 {
     if (root != NULL)
     {
-        printf("%d  ", root->data);
+        pre[preorder]=root->data;
+        preorder++;
         preorder_Traversal(root->left);
         preorder_Traversal(root->right);
     }
@@ -50,8 +53,13 @@ void postorder_Traversal(bst *root)
     {
         postorder_Traversal(root->left);
         postorder_Traversal(root->right);
-        printf("%d  ", root->data);
+        post[postorder]=root->data;
+        postorder++;
     }
+}
+void display(int *arr,int n){
+    for(int i=0;i<n;i++)
+        printf("%d ",arr[i]);
 }
 bst *find_minimum(bst *root)
 {
@@ -66,9 +74,9 @@ bst *deleteNode(bst *root, int value)
     if (root == NULL)
         return NULL;
     else if (value < root->data)
-        return root->left = deleteNode(root->left, value);
+         root->left = deleteNode(root->left, value);
     else if (value > root->data)
-        return root->right = deleteNode(root->right, value);
+         root->right = deleteNode(root->right, value);
     else
     {
         if (root->left == NULL && root->right == NULL)
@@ -91,40 +99,45 @@ bst *deleteNode(bst *root, int value)
         else
         {
             bst *temp = find_minimum(root->right);
-            printf("\n%d\n", temp->data);
             root->data = temp->data;
             root->right = deleteNode(root->right, temp->data);
         }
-        return root;
+    }
+     return root;
+}
+int lh,rh;
+int height(bst* root){
+    if(root==NULL)
+        return 0;
+    else{
+        lh=height(root->left);
+        rh=height(root->right);
+    }
+    return fmax(lh,rh)+1;
+}
+void level_order(bst* root){
+    int h=height(root);
+    for(int i=0;i<h;i++){
+        level_print(root,i);
+    }
+}
+void level_print(bst* root,int level){
+    if(root==NULL)
+        return;
+    else if(level==0)
+        printf("%d ",root->data);
+    else{
+        level_print(root->left,level-1);
+        level_print(root->right,level-1);
     }
 }
 int main()
 {
     bst *root;
-    /*root = create(25);
-    insert(root, 22);
-    insert(root, 35);
-    insert(root, 32);
-    insert(root, 30);
-    insert(root, 38);
-    inorder_Traversal(root);
-    printf("\n");
-    preorder_Traversal(root);
-    printf("\n");
-    postorder_Traversal(root);
-    bst *temp = find_minimum(root);
-    // printf("\nMinimum element is:%d", temp->data);
-    deleteNode(root, 35);
-    printf("\n");
-    inorder_Traversal(root);
-    printf("\n");
-    preorder_Traversal(root);
-    printf("\n");
-    postorder_Traversal(root);*/
     int flag = 0, ch, value, n;
     while (1)
     {
-        printf("\n1-Insert\n2-Delete Node\n3-Inorder Traversal\n4-Preorder Traversal\n5-Postorder Taversal\n6-Minimum elemnt\nEnter your choice:");
+        printf("\n1-Insert\n2-Delete Node\n3-Inorder Traversal\n4-Preorder Traversal\n5-Postorder Taversal\n6-Minimum elemnt\n7-Height of the tree\n8-Levelorder Traversal\nEnter your choice:");
         scanf("%d", &ch);
         switch (ch)
         {
@@ -154,20 +167,28 @@ int main()
         case 3:
             printf("\nInorder Traversal:");
             inorder_Traversal(root);
+            display(in,inorder);
             break;
         case 4:
             printf("\nPreorder Traversal:");
             preorder_Traversal(root);
+            display(pre,preorder);
             break;
         case 5:
             printf("\nPostorder Traversal:");
             postorder_Traversal(root);
+            display(post,postorder);
             break;
         case 6:
             printf("\nMininmum Element:");
             bst *temp = find_minimum(root);
             printf("%d", temp->data);
             break;
+        case 7:printf("\nHeight of tree:%d",height(root));
+                break;
+        case 8:printf("\nLevelorder Traversal:");
+                level_order(root);
+                break;
         default:
             printf("You Entered wrong choice :(");
             exit(0);
